@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>월록 — 답변하기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=IBM+Plex+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#FAF8F5; --ink:#1A1814; --muted:#9A9590; --line:#E8E4DF; --error:#C75050; --success:#3A7D5C; }
+    html { height:100%; }
+    body { min-height:100%; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif; font-weight:300; display:flex; align-items:center; justify-content:center; padding:2rem 1.5rem; line-height:1.7; }
+    .container { width:100%; max-width:400px; animation:fadeUp .6s ease-out; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    .logo-wrap { text-align:center; margin-bottom:16px; }
+    .logo-wrap img { height:28px; }
+    .meta { font-size:12px; color:#B5B0AB; margin-bottom:40px; text-align:center; }
+    .q-label { font-size:12px; color:var(--muted); margin-bottom:8px; letter-spacing:0.5px; }
+    .question { font-family:'Noto Serif KR',serif; font-size:22px; font-weight:400; line-height:1.6; margin-bottom:40px; color:var(--ink); }
+    .answer-area { width:100%; min-height:100px; padding:16px 0; font-size:16px; font-family:inherit; font-weight:300; line-height:1.7; border:none; border-bottom:1px solid var(--line); background:transparent; color:var(--ink); outline:none; resize:none; transition:border-color .2s; }
+    .answer-area:focus { border-bottom-color:var(--ink); }
+    .answer-area::placeholder { color:#CCC8C3; }
+    .char-count { text-align:right; font-size:12px; color:#CCC8C3; margin-top:8px; }
+    .btn { width:100%; margin-top:32px; padding:16px; font-size:15px; font-family:inherit; font-weight:400; background:var(--ink); color:#fff; border:none; border-radius:8px; cursor:pointer; transition:opacity .2s; }
+    .btn:hover { opacity:.85; }
+    .btn:disabled { opacity:.4; cursor:default; }
+    .message { margin-top:20px; padding:16px 20px; border-radius:8px; font-size:14px; line-height:1.8; display:none; }
+    .message.success { display:block; background:#F0F7F3; color:var(--success); }
+    .message.error { display:block; background:#FDF2F2; color:var(--error); }
+    .existing-box { margin-bottom:24px; padding:16px 20px; background:#F5F3F0; border-radius:8px; font-size:14px; line-height:1.7; color:#6B665F; display:none; }
+    .existing-box .label { font-size:12px; color:var(--muted); margin-bottom:6px; }
+    .existing-box .prev-answer { color:var(--ink); }
+    .existing-box .edit-link { display:inline-block; margin-top:10px; font-size:13px; color:var(--muted); cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+    .footer { margin-top:48px; font-size:12px; color:#CCC8C3; text-align:center; }
+    .confirm-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(26,24,20,0.4); z-index:100; align-items:center; justify-content:center; }
+    .confirm-overlay.show { display:flex; }
+    .confirm-box { background:#fff; border-radius:12px; padding:28px 24px; max-width:320px; width:90%; text-align:center; }
+    .confirm-box p { font-size:15px; line-height:1.7; margin-bottom:20px; color:var(--ink); }
+    .confirm-box .btn-row { display:flex; gap:10px; }
+    .confirm-box .btn-cancel { flex:1; padding:12px; font-size:14px; font-family:inherit; background:#F5F3F0; color:var(--muted); border:none; border-radius:8px; cursor:pointer; }
+    .confirm-box .btn-confirm { flex:1; padding:12px; font-size:14px; font-family:inherit; background:var(--ink); color:#fff; border:none; border-radius:8px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-wrap">
+      <img src="logo.png" alt="월록 wollog">
+    </div>
+    <div class="meta" id="metaInfo"></div>
+
+    <div class="q-label" id="qLabel"></div>
+    <h1 class="question" id="questionText"></h1>
+
+    <div class="existing-box" id="existingBox">
+      <div class="label">이미 남긴 답변이 있어요</div>
+      <div class="prev-answer" id="prevAnswer"></div>
+      <span class="edit-link" onclick="enableEdit()">다시 쓸래요</span>
+    </div>
+
+    <div id="answerSection">
+      <textarea class="answer-area" id="answer" placeholder="여기에 적어주세요" maxlength="300"></textarea>
+      <div class="char-count"><span id="charNum">0</span> / 300</div>
+      <button class="btn" id="submitBtn" onclick="handleSubmit()">답변 남기기</button>
+    </div>
+
+    <div id="msg" class="message"></div>
+    <div class="footer">wollog.co.kr</div>
+  </div>
+
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <p>이전 답변을 덮어쓸까요?<br>되돌릴 수 없어요.</p>
+      <div class="btn-row">
+        <button class="btn-cancel" onclick="closeConfirm()">취소</button>
+        <button class="btn-confirm" onclick="confirmSubmit()">덮어쓰기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL='https://script.google.com/macros/s/AKfycbzGJcIlPRRVqdUBP1MBC6L6ky15HCIYyH-oKwkw2BaO3C7LWtQmg7rPU2BSDLcMwHnFKg/exec';
+    const params=new URLSearchParams(window.location.search);
+    const uid=params.get('uid')||'';
+    const q=params.get('q')||'';
+    const cycle=params.get('cycle')||'';
+    const questions={
+      'Q01':'요즘 자꾸 재생하게 되는 노래는?',
+      'Q02':'요즘 이 계절을 만끽하기 위해 한 가지 하고 있는 것은?',
+      'Q03':'요즘 자꾸 가고 싶어지는 곳은?',
+      'Q04':'요즘 자꾸 생각나는 사람이나 장면은?',
+      'Q05':'요즘 자꾸 미루고 있는 것은?',
+      'Q06':'요즘 듣고 싶은 말은?',
+      'Q07':'요즘 내가 가장 잘 하고 있는 것은?',
+      'Q08':'요즘 나를 가장 흔드는 것은?',
+      'Q09':'요즘 가장 좋아하는 시간대는?',
+      'Q10':'이번 달의 나를 한 단어로 표현하면?',
+    };
+    const qNum=parseInt((q||'Q0').replace('Q',''));
+    const today=new Date();
+    const dateStr=today.getFullYear()+'년 '+(today.getMonth()+1)+'월 '+today.getDate()+'일';
+    const monthNum=today.getMonth()+1;
+    document.getElementById('metaInfo').textContent=dateStr+'  |  '+monthNum+'월의 '+qNum+'번째 질문';
+    document.getElementById('qLabel').textContent=q;
+    document.getElementById('questionText').textContent='Q. '+(questions[q]||'질문을 불러올 수 없어요.');
+    const answerEl=document.getElementById('answer');
+    answerEl.addEventListener('input',function(){document.getElementById('charNum').textContent=this.value.length;});
+    let hasExisting=false;
+    async function checkExisting(){
+      if(!uid||!q||!cycle)return;
+      try{
+        const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'check',email:uid,q:q,cycle:cycle})});
+        const data=await res.json();
+        if(data.success&&data.exists){
+          hasExisting=true;
+          document.getElementById('prevAnswer').textContent=data.answer;
+          document.getElementById('existingBox').style.display='block';
+          document.getElementById('answerSection').style.display='none';
+        }
+      }catch(e){}
+    }
+    checkExisting();
+    function enableEdit(){
+      document.getElementById('existingBox').style.display='none';
+      document.getElementById('answerSection').style.display='block';
+      answerEl.focus();
+    }
+    function handleSubmit(){
+      const answer=answerEl.value.trim();
+      const msg=document.getElementById('msg');
+      if(!answer){msg.textContent='답변을 입력해주세요.';msg.className='message error';return;}
+      if(!uid||!q||!cycle){msg.textContent='잘못된 접근이에요. 메일의 링크를 통해 접속해주세요.';msg.className='message error';return;}
+      if(hasExisting){document.getElementById('confirmOverlay').className='confirm-overlay show';return;}
+      doSubmit();
+    }
+    function closeConfirm(){document.getElementById('confirmOverlay').className='confirm-overlay';}
+    function confirmSubmit(){closeConfirm();doSubmit();}
+    async function doSubmit(){
+      const answer=answerEl.value.trim();
+      const btn=document.getElementById('submitBtn');
+      const msg=document.getElementById('msg');
+      btn.disabled=true;btn.textContent='보내는 중...';msg.className='message';msg.style.display='none';
+      try{
+        const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'answer',email:uid,q:q,answer:answer,cycle:cycle})});
+        const data=await res.json();
+        if(data.success){msg.textContent=data.message;msg.className='message success';btn.textContent='기록됐어요!';answerEl.disabled=true;}
+        else{msg.textContent=data.message;msg.className='message error';btn.disabled=false;btn.textContent='답변 남기기';}
+      }catch(err){msg.textContent='오류가 발생했어요. 다시 시도해주세요.';msg.className='message error';btn.disabled=false;btn.textContent='답변 남기기';}
+    }
+  </script>
+</body>
+</html>
