@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=IBM+Plex+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { height:100%; }
+    html { height:100%; background:#E8E3DC; }
     body {
       min-height:100%;
       background:linear-gradient(165deg,#F7F4EF 0%,#EDE8E1 40%,#E8E3DC 100%);
@@ -194,9 +194,9 @@
 
     <div class="footer">
       <div class="footer-links">
-        <a href="#">공유하기</a>
+        <a href="#" onclick="shareLink(event)">공유하기</a>
         <span class="dot">●</span>
-        <a href="#">인스타그램</a>
+        <a href="https://www.instagram.com/wollog.official" target="_blank">인스타그램</a>
       </div>
     </div>
   </div>
@@ -283,6 +283,12 @@
         if(data.success){msg.textContent='기록됐어요.';msg.className='message success';btn.textContent='기록 완료';answerEl.disabled=true;}
         else{msg.textContent=data.message;msg.className='message error';btn.disabled=false;btn.textContent='답변 남기기';}
       }catch(err){msg.textContent='오류가 발생했어요. 다시 시도해주세요.';msg.className='message error';btn.disabled=false;btn.textContent='답변 남기기';}
+    }
+    function shareLink(e){
+      e.preventDefault();
+      var url=window.location.origin;
+      if(navigator.share){navigator.share({title:'월록',text:'매달 같은 질문, 달라지는 나의 답변.',url:url});}
+      else{navigator.clipboard.writeText(url).then(function(){alert('링크가 복사됐어요!');});}
     }
   </script>
 </body>
