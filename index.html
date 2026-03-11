@@ -5,59 +5,162 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>월록 — 매달 나를 기록하는 시간</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=IBM+Plex+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=IBM+Plex+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#FAF8F5; --ink:#1A1814; --muted:#9A9590; --line:#E8E4DF; --error:#C75050; --success:#3A7D5C; }
     html { height:100%; }
-    body { min-height:100%; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif; font-weight:300; display:flex; align-items:center; justify-content:center; padding:2rem 1.5rem; line-height:1.7; }
-    .container { width:100%; max-width:400px; animation:fadeUp .6s ease-out; }
+    body {
+      min-height:100%;
+      background:linear-gradient(165deg,#F7F4EF 0%,#EDE8E1 40%,#E8E3DC 100%);
+      color:#1A1814;
+      font-family:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+      font-weight:300;
+      display:flex; align-items:center; justify-content:center;
+      padding:48px 20px;
+      line-height:1.7;
+    }
+    .container { width:100%; max-width:460px; animation:fadeUp .6s ease-out; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-    .logo-wrap { text-align:center; margin-bottom:48px; }
-    .logo-wrap img { height:28px; }
-    .headline { font-family:'Noto Serif KR',serif; font-size:22px; font-weight:400; line-height:1.7; margin-bottom:16px; color:var(--ink); }
-    .subtitle { font-size:14px; color:var(--muted); margin-bottom:48px; line-height:1.8; }
+
+    .logo-wrap { text-align:center; margin-bottom:44px; }
+    .logo-ko {
+      display:block;
+      font-family:'Noto Serif KR',serif;
+      font-size:20px; font-weight:400; color:#1A1814;
+      letter-spacing:4px;
+    }
+    .logo-en {
+      display:block; margin-top:4px;
+      font-size:10px; font-weight:300; color:#B5B0AB;
+      letter-spacing:5px;
+    }
+
+    /* 메인 카드 */
+    .card {
+      background:rgba(255,255,255,0.75);
+      -webkit-backdrop-filter:blur(20px);
+      backdrop-filter:blur(20px);
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,0.6);
+      box-shadow:0 4px 24px rgba(0,0,0,0.04);
+      padding:36px 32px 40px;
+      margin-bottom:8px;
+    }
+
+    .headline {
+      font-family:'Noto Serif KR',serif;
+      font-size:24px; font-weight:400; line-height:1.6;
+      margin-bottom:14px; color:#1A1814;
+    }
+    .subtitle {
+      font-size:14px; color:#9A9590; line-height:1.9; margin-bottom:36px;
+    }
+
     .field { margin-bottom:20px; }
-    .field label { display:block; font-size:13px; color:var(--muted); margin-bottom:8px; }
-    .field input { width:100%; padding:14px 0; font-size:16px; font-family:inherit; font-weight:300; border:none; border-bottom:1px solid var(--line); background:transparent; color:var(--ink); outline:none; transition:border-color .2s; }
-    .field input:focus { border-bottom-color:var(--ink); }
+    .field label { display:block; font-size:12px; color:#B5B0AB; margin-bottom:8px; letter-spacing:0.3px; }
+    .field input {
+      width:100%; padding:14px 0; font-size:16px;
+      font-family:inherit; font-weight:300;
+      border:none; border-bottom:1px solid #E8E4DF;
+      background:transparent; color:#1A1814; outline:none;
+      transition:border-color .2s;
+    }
+    .field input:focus { border-bottom-color:#1A1814; }
     .field input::placeholder { color:#CCC8C3; }
-    .btn { width:100%; margin-top:36px; padding:16px; font-size:15px; font-family:inherit; font-weight:400; background:var(--ink); color:#fff; border:none; border-radius:8px; cursor:pointer; transition:opacity .2s; }
+
+    .btn {
+      width:100%; margin-top:32px; padding:16px;
+      font-size:14px; font-family:inherit; font-weight:400;
+      background:#1A1814; color:#fff;
+      border:none; border-radius:12px; cursor:pointer;
+      letter-spacing:0.3px;
+      box-shadow:0 2px 12px rgba(26,24,20,0.12);
+      transition:opacity .2s;
+    }
     .btn:hover { opacity:.85; }
     .btn:disabled { opacity:.4; cursor:default; }
-    .message { margin-top:20px; padding:16px 20px; border-radius:8px; font-size:14px; line-height:1.8; display:none; }
-    .message.success { display:block; background:#F0F7F3; color:var(--success); }
-    .message.error { display:block; background:#FDF2F2; color:var(--error); }
-    .note { margin-top:48px; padding-top:32px; border-top:1px solid var(--line); font-size:13px; color:var(--muted); line-height:1.8; }
-    .footer { margin-top:48px; font-size:12px; color:#CCC8C3; text-align:center; }
+
+    .message { margin-top:20px; padding:16px 20px; border-radius:12px; font-size:14px; line-height:1.8; display:none; }
+    .message.success { display:block; background:rgba(58,125,92,0.08); color:#3A7D5C; }
+    .message.error { display:block; background:rgba(199,80,80,0.08); color:#C75050; }
+
+    /* 안내 카드 */
+    .info-card {
+      background:rgba(255,255,255,0.4);
+      -webkit-backdrop-filter:blur(16px);
+      backdrop-filter:blur(16px);
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,0.3);
+      box-shadow:0 2px 16px rgba(0,0,0,0.02);
+      padding:28px 24px;
+      text-align:center;
+    }
+    .info-card .info-main {
+      font-size:14px; color:#9A9590; line-height:1.9; margin-bottom:8px;
+    }
+    .info-card .info-sub {
+      font-size:12px; color:#C5C0BB;
+    }
+
+    /* 푸터 */
+    .footer { margin-top:36px; text-align:center; }
+    .footer-links { margin-bottom:12px; }
+    .footer-links a {
+      font-size:13px; color:#9A9590; text-decoration:none;
+      padding:0 16px;
+    }
+    .footer-links .dot { color:#DDD8D3; font-size:8px; }
+    .footer-sub a {
+      font-size:11px; color:#CCC8C3; text-decoration:none;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="logo-wrap">
-      <img src="logo.png" alt="월록 wollog">
+      <span class="logo-ko">월록</span>
+      <span class="logo-en">WOLLOG</span>
     </div>
 
-    <h1 class="headline">매달 같은 질문,<br>달라지는 나의 답변.</h1>
-    <p class="subtitle">한 달에 10개의 질문이 메일로 도착해요.<br>한 달 뒤, 같은 질문과 함께 지난 내 답변을 돌려드려요.</p>
+    <div class="card">
+      <h1 class="headline">매달 같은 질문,<br>달라지는 나의 답변.</h1>
+      <p class="subtitle">
+        한 달에 10개의 질문이 메일로 도착해요.<br>
+        한 달 뒤, 같은 질문과 함께 지난 내 답변을 돌려드려요.
+      </p>
 
-    <div id="formSection">
-      <div class="field">
-        <label>이메일</label>
-        <input type="email" id="email" placeholder="you@email.com" autocomplete="email">
+      <div id="formSection">
+        <div class="field">
+          <label>이메일</label>
+          <input type="email" id="email" placeholder="you@email.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label>닉네임</label>
+          <input type="text" id="nickname" placeholder="월록에서 불릴 이름" autocomplete="given-name" maxlength="20">
+        </div>
+        <button class="btn" id="submitBtn" onclick="handleSubmit()">시작하기</button>
       </div>
-      <div class="field">
-        <label>닉네임</label>
-        <input type="text" id="nickname" placeholder="월록에서 불릴 이름" autocomplete="given-name" maxlength="20">
-      </div>
-      <button class="btn" id="submitBtn" onclick="handleSubmit()">시작하기</button>
+
+      <div id="msg" class="message"></div>
     </div>
 
-    <div id="msg" class="message"></div>
+    <div class="info-card">
+      <div class="info-main">
+        월·수·금, 질문 하나가 메일로 도착해요.<br>
+        답변은 1분이면 충분해요.
+      </div>
+      <div class="info-sub">답이 쌓일수록, 달라진 내가 보여요.</div>
+    </div>
 
-    <div class="note">월·수·금, 질문 하나가 메일로 도착해요.<br>답변은 1분이면 충분해요.</div>
-    <div class="footer">wollog.co.kr</div>
+    <div class="footer">
+      <div class="footer-links">
+        <a href="#">공유하기</a>
+        <span class="dot">●</span>
+        <a href="#">인스타그램</a>
+      </div>
+    </div>
   </div>
+
   <script>
     const API_URL='https://script.google.com/macros/s/AKfycbzGJcIlPRRVqdUBP1MBC6L6ky15HCIYyH-oKwkw2BaO3C7LWtQmg7rPU2BSDLcMwHnFKg/exec';
     async function handleSubmit(){
@@ -72,7 +175,7 @@
         const data=await res.json();
         if(data.success){
           document.getElementById('formSection').style.display='none';
-          msg.innerHTML=data.message+'<br><br>가장 가까운 월·수·금에<br>첫 번째 질문이 메일로 도착할 거예요.<br><br>메일함을 확인해주세요 :)';
+          msg.innerHTML='환영해요!<br><br>가장 가까운 월·수·금에<br>첫 번째 질문이 메일로 도착할 거예요.';
           msg.className='message success';
         }else{msg.textContent=data.message;msg.className='message error';btn.disabled=false;btn.textContent='시작하기';}
       }catch(err){msg.textContent='오류가 발생했어요. 다시 시도해주세요.';msg.className='message error';btn.disabled=false;btn.textContent='시작하기';}

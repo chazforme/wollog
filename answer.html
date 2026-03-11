@@ -5,67 +5,200 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>월록 — 답변하기</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=IBM+Plex+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=IBM+Plex+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#FAF8F5; --ink:#1A1814; --muted:#9A9590; --line:#E8E4DF; --error:#C75050; --success:#3A7D5C; }
     html { height:100%; }
-    body { min-height:100%; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif; font-weight:300; display:flex; align-items:center; justify-content:center; padding:2rem 1.5rem; line-height:1.7; }
-    .container { width:100%; max-width:400px; animation:fadeUp .6s ease-out; }
+    body {
+      min-height:100%;
+      background:linear-gradient(165deg,#F7F4EF 0%,#EDE8E1 40%,#E8E3DC 100%);
+      color:#1A1814;
+      font-family:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+      font-weight:300;
+      display:flex; align-items:center; justify-content:center;
+      padding:48px 20px;
+      line-height:1.7;
+    }
+    .container { width:100%; max-width:460px; animation:fadeUp .6s ease-out; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-    .logo-wrap { text-align:center; margin-bottom:16px; }
-    .logo-wrap img { height:28px; }
-    .meta { font-size:12px; color:#B5B0AB; margin-bottom:40px; text-align:center; }
-    .q-label { font-size:12px; color:var(--muted); margin-bottom:8px; letter-spacing:0.5px; }
-    .question { font-family:'Noto Serif KR',serif; font-size:22px; font-weight:400; line-height:1.6; margin-bottom:40px; color:var(--ink); }
-    .answer-area { width:100%; min-height:100px; padding:16px 0; font-size:16px; font-family:inherit; font-weight:300; line-height:1.7; border:none; border-bottom:1px solid var(--line); background:transparent; color:var(--ink); outline:none; resize:none; transition:border-color .2s; }
-    .answer-area:focus { border-bottom-color:var(--ink); }
+
+    .logo-wrap { text-align:center; margin-bottom:44px; }
+    .logo-ko {
+      display:block;
+      font-family:'Noto Serif KR',serif;
+      font-size:20px; font-weight:400; color:#1A1814;
+      letter-spacing:4px;
+    }
+    .logo-en {
+      display:block; margin-top:4px;
+      font-size:10px; font-weight:300; color:#B5B0AB;
+      letter-spacing:5px;
+    }
+
+    /* 질문 카드 */
+    .card {
+      background:rgba(255,255,255,0.75);
+      -webkit-backdrop-filter:blur(20px);
+      backdrop-filter:blur(20px);
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,0.6);
+      box-shadow:0 4px 24px rgba(0,0,0,0.04);
+      padding:36px 32px 40px;
+      margin-bottom:8px;
+    }
+
+    .meta {
+      font-size:13px; color:#B5B0AB; margin-bottom:28px; letter-spacing:0.3px;
+    }
+    .question {
+      font-family:'Noto Serif KR',serif;
+      font-size:24px; font-weight:400; line-height:1.6;
+      color:#1A1814; margin-bottom:0;
+    }
+
+    /* 답변 카드 */
+    .answer-card {
+      background:rgba(255,255,255,0.75);
+      -webkit-backdrop-filter:blur(20px);
+      backdrop-filter:blur(20px);
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,0.6);
+      box-shadow:0 4px 24px rgba(0,0,0,0.04);
+      padding:28px 24px 30px;
+      margin-bottom:8px;
+    }
+
+    .answer-area {
+      width:100%; min-height:120px; padding:0; font-size:15px;
+      font-family:inherit; font-weight:300; line-height:1.8;
+      border:none; background:transparent; color:#1A1814;
+      outline:none; resize:none;
+    }
     .answer-area::placeholder { color:#CCC8C3; }
-    .char-count { text-align:right; font-size:12px; color:#CCC8C3; margin-top:8px; }
-    .btn { width:100%; margin-top:32px; padding:16px; font-size:15px; font-family:inherit; font-weight:400; background:var(--ink); color:#fff; border:none; border-radius:8px; cursor:pointer; transition:opacity .2s; }
+    .answer-meta {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top:16px; padding-top:16px;
+      border-top:1px solid rgba(0,0,0,0.04);
+    }
+    .char-count { font-size:12px; color:#CCC8C3; }
+
+    .btn {
+      width:100%; padding:16px;
+      font-size:14px; font-family:inherit; font-weight:400;
+      background:#1A1814; color:#fff;
+      border:none; border-radius:12px; cursor:pointer;
+      letter-spacing:0.3px;
+      box-shadow:0 2px 12px rgba(26,24,20,0.12);
+      transition:opacity .2s;
+    }
     .btn:hover { opacity:.85; }
     .btn:disabled { opacity:.4; cursor:default; }
-    .message { margin-top:20px; padding:16px 20px; border-radius:8px; font-size:14px; line-height:1.8; display:none; }
-    .message.success { display:block; background:#F0F7F3; color:var(--success); }
-    .message.error { display:block; background:#FDF2F2; color:var(--error); }
-    .existing-box { margin-bottom:24px; padding:16px 20px; background:#F5F3F0; border-radius:8px; font-size:14px; line-height:1.7; color:#6B665F; display:none; }
-    .existing-box .label { font-size:12px; color:var(--muted); margin-bottom:6px; }
-    .existing-box .prev-answer { color:var(--ink); }
-    .existing-box .edit-link { display:inline-block; margin-top:10px; font-size:13px; color:var(--muted); cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
-    .footer { margin-top:48px; font-size:12px; color:#CCC8C3; text-align:center; }
-    .confirm-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(26,24,20,0.4); z-index:100; align-items:center; justify-content:center; }
+
+    .message { margin-top:16px; padding:16px 20px; border-radius:12px; font-size:14px; line-height:1.8; display:none; }
+    .message.success { display:block; background:rgba(58,125,92,0.08); color:#3A7D5C; }
+    .message.error { display:block; background:rgba(199,80,80,0.08); color:#C75050; }
+
+    /* 기존 답변 카드 */
+    .existing-card {
+      background:rgba(255,255,255,0.5);
+      -webkit-backdrop-filter:blur(16px);
+      backdrop-filter:blur(16px);
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,0.4);
+      box-shadow:0 2px 16px rgba(0,0,0,0.03);
+      padding:24px 24px 26px;
+      margin-bottom:8px;
+      display:none;
+    }
+    .existing-label { font-size:12px; color:#B5B0AB; margin-bottom:10px; letter-spacing:0.3px; }
+    .existing-answer { font-size:15px; line-height:1.7; color:#4A4540; margin-bottom:14px; }
+    .edit-link {
+      display:inline-block; font-size:13px; color:#9A9590;
+      cursor:pointer; text-decoration:underline;
+      text-underline-offset:3px;
+    }
+
+    /* 푸터 */
+    .footer { margin-top:36px; text-align:center; }
+    .footer-links { margin-bottom:12px; }
+    .footer-links a {
+      font-size:13px; color:#9A9590; text-decoration:none;
+      padding:0 16px;
+    }
+    .footer-links .dot { color:#DDD8D3; font-size:8px; }
+
+    /* 확인 모달 */
+    .confirm-overlay {
+      display:none; position:fixed; top:0; left:0;
+      width:100%; height:100%;
+      background:rgba(26,24,20,0.35);
+      -webkit-backdrop-filter:blur(4px);
+      backdrop-filter:blur(4px);
+      z-index:100; align-items:center; justify-content:center;
+    }
     .confirm-overlay.show { display:flex; }
-    .confirm-box { background:#fff; border-radius:12px; padding:28px 24px; max-width:320px; width:90%; text-align:center; }
-    .confirm-box p { font-size:15px; line-height:1.7; margin-bottom:20px; color:var(--ink); }
+    .confirm-box {
+      background:rgba(255,255,255,0.92);
+      -webkit-backdrop-filter:blur(20px);
+      backdrop-filter:blur(20px);
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,0.6);
+      box-shadow:0 8px 32px rgba(0,0,0,0.08);
+      padding:32px 28px; max-width:320px; width:90%; text-align:center;
+    }
+    .confirm-box p { font-size:15px; line-height:1.7; margin-bottom:24px; color:#1A1814; }
     .confirm-box .btn-row { display:flex; gap:10px; }
-    .confirm-box .btn-cancel { flex:1; padding:12px; font-size:14px; font-family:inherit; background:#F5F3F0; color:var(--muted); border:none; border-radius:8px; cursor:pointer; }
-    .confirm-box .btn-confirm { flex:1; padding:12px; font-size:14px; font-family:inherit; background:var(--ink); color:#fff; border:none; border-radius:8px; cursor:pointer; }
+    .confirm-box .btn-cancel {
+      flex:1; padding:14px; font-size:14px; font-family:inherit;
+      background:rgba(0,0,0,0.04); color:#9A9590;
+      border:none; border-radius:12px; cursor:pointer;
+    }
+    .confirm-box .btn-confirm {
+      flex:1; padding:14px; font-size:14px; font-family:inherit;
+      background:#1A1814; color:#fff;
+      border:none; border-radius:12px; cursor:pointer;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="logo-wrap">
-      <img src="logo.png" alt="월록 wollog">
+      <span class="logo-ko">월록</span>
+      <span class="logo-en">WOLLOG</span>
     </div>
-    <div class="meta" id="metaInfo"></div>
 
-    <div class="q-label" id="qLabel"></div>
-    <h1 class="question" id="questionText"></h1>
+    <!-- 질문 카드 -->
+    <div class="card">
+      <div class="meta" id="metaInfo"></div>
+      <h1 class="question" id="questionText"></h1>
+    </div>
 
-    <div class="existing-box" id="existingBox">
-      <div class="label">이미 남긴 답변이 있어요</div>
-      <div class="prev-answer" id="prevAnswer"></div>
+    <!-- 기존 답변 -->
+    <div class="existing-card" id="existingBox">
+      <div class="existing-label">이미 남긴 답변이 있어요</div>
+      <div class="existing-answer" id="prevAnswer"></div>
       <span class="edit-link" onclick="enableEdit()">다시 쓸래요</span>
     </div>
 
-    <div id="answerSection">
-      <textarea class="answer-area" id="answer" placeholder="여기에 적어주세요" maxlength="300"></textarea>
-      <div class="char-count"><span id="charNum">0</span> / 300</div>
-      <button class="btn" id="submitBtn" onclick="handleSubmit()">답변 남기기</button>
+    <!-- 답변 입력 카드 -->
+    <div class="answer-card" id="answerSection">
+      <textarea class="answer-area" id="answer" placeholder="여기에 적어주세요" maxlength="200"></textarea>
+      <div class="answer-meta">
+        <span></span>
+        <span class="char-count"><span id="charNum">0</span> / 200</span>
+      </div>
     </div>
 
+    <button class="btn" id="submitBtn" onclick="handleSubmit()">답변 남기기</button>
     <div id="msg" class="message"></div>
-    <div class="footer">wollog.co.kr</div>
+
+    <div class="footer">
+      <div class="footer-links">
+        <a href="#">공유하기</a>
+        <span class="dot">●</span>
+        <a href="#">인스타그램</a>
+      </div>
+    </div>
   </div>
 
   <div class="confirm-overlay" id="confirmOverlay">
@@ -98,13 +231,14 @@
     };
     const qNum=parseInt((q||'Q0').replace('Q',''));
     const today=new Date();
-    const dateStr=today.getFullYear()+'년 '+(today.getMonth()+1)+'월 '+today.getDate()+'일';
     const monthNum=today.getMonth()+1;
-    document.getElementById('metaInfo').textContent=dateStr+'  |  '+monthNum+'월의 '+qNum+'번째 질문';
-    document.getElementById('qLabel').textContent=q;
+    const dateStr=today.getFullYear()+'년 '+monthNum+'월 '+today.getDate()+'일';
+    document.getElementById('metaInfo').textContent=dateStr+'  ·  '+monthNum+'월의 '+qNum+'번째 질문';
     document.getElementById('questionText').textContent='Q. '+(questions[q]||'질문을 불러올 수 없어요.');
+
     const answerEl=document.getElementById('answer');
     answerEl.addEventListener('input',function(){document.getElementById('charNum').textContent=this.value.length;});
+
     let hasExisting=false;
     async function checkExisting(){
       if(!uid||!q||!cycle)return;
@@ -116,13 +250,16 @@
           document.getElementById('prevAnswer').textContent=data.answer;
           document.getElementById('existingBox').style.display='block';
           document.getElementById('answerSection').style.display='none';
+          document.getElementById('submitBtn').style.display='none';
         }
       }catch(e){}
     }
     checkExisting();
+
     function enableEdit(){
       document.getElementById('existingBox').style.display='none';
       document.getElementById('answerSection').style.display='block';
+      document.getElementById('submitBtn').style.display='block';
       answerEl.focus();
     }
     function handleSubmit(){
@@ -143,7 +280,7 @@
       try{
         const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'answer',email:uid,q:q,answer:answer,cycle:cycle})});
         const data=await res.json();
-        if(data.success){msg.textContent=data.message;msg.className='message success';btn.textContent='기록됐어요!';answerEl.disabled=true;}
+        if(data.success){msg.textContent='기록됐어요.';msg.className='message success';btn.textContent='기록 완료';answerEl.disabled=true;}
         else{msg.textContent=data.message;msg.className='message error';btn.disabled=false;btn.textContent='답변 남기기';}
       }catch(err){msg.textContent='오류가 발생했어요. 다시 시도해주세요.';msg.className='message error';btn.disabled=false;btn.textContent='답변 남기기';}
     }
