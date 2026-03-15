@@ -95,6 +95,7 @@
     .message { margin-top:20px; padding:16px 20px; border-radius:12px; font-size:14px; line-height:1.8; display:none; }
     .message.success { display:block; background:rgba(58,125,92,0.08); color:#3A7D5C; }
     .message.error { display:block; background:rgba(199,80,80,0.08); color:#C75050; }
+    .message.info { display:block; background:rgba(180,150,90,0.08); color:#8A6F3E; }
 
     /* 안내 카드 */
     .info-card {
@@ -197,6 +198,23 @@
 
   <script>
     const API_URL='https://script.google.com/macros/s/AKfycbzGJcIlPRRVqdUBP1MBC6L6ky15HCIYyH-oKwkw2BaO3C7LWtQmg7rPU2BSDLcMwHnFKg/exec';
+
+    function getNextMailDate(){
+      const today=new Date();
+      const hour=today.getHours();
+      const mailDays=[1,3,5];
+      const dayNames=['일','월','화','수','목','금','토'];
+      for(let i=0;i<=7;i++){
+        const d=new Date(today);
+        d.setDate(today.getDate()+i);
+        if(mailDays.includes(d.getDay())){
+          if(i===0&&hour>=8)continue;
+          return (d.getMonth()+1)+'월 '+d.getDate()+'일 ('+dayNames[d.getDay()]+')';
+        }
+      }
+      return '가장 가까운 월·수·금';
+    }
+
     async function handleSubmit(){
       const email=document.getElementById('email').value.trim();
       const nickname=document.getElementById('nickname').value.trim();
@@ -211,9 +229,16 @@
         const data=await res.json();
         if(data.success){
           document.getElementById('formSection').style.display='none';
-          msg.innerHTML='환영해요!<br><br>가장 가까운 월·수·금 오전 8시에<br>첫 번째 질문이 메일로 도착할 거예요.';
+          const nextDate=getNextMailDate();
+          msg.innerHTML='환영해요, '+nickname+'님!<br><br>첫 번째 질문은 <strong>'+nextDate+' 오전 8시</strong>에<br>메일로 도착할 거예요.';
           msg.className='message success';
-        }else{msg.textContent=data.message;msg.className='message error';btn.disabled=false;btn.textContent='시작하기';}
+        }else if(data.message&&data.message.includes('이미 가입')){
+          msg.innerHTML='이미 가입된 이메일이에요.<br><span style="font-size:13px;opacity:.8;">메일함에서 월록을 찾아보세요.</span>';
+          msg.className='message info';
+          btn.disabled=false;btn.textContent='시작하기';
+        }else{
+          msg.textContent=data.message;msg.className='message error';btn.disabled=false;btn.textContent='시작하기';
+        }
       }catch(err){msg.textContent='오류가 발생했어요. 다시 시도해주세요.';msg.className='message error';btn.disabled=false;btn.textContent='시작하기';}
     }
     document.addEventListener('keydown',function(e){if(e.key==='Enter')handleSubmit();});
