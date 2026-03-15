@@ -230,9 +230,10 @@
       'Q10':'이번 달의 나를 한 단어로 표현하면?',
     };
     const qNum=parseInt((q||'Q0').replace('Q',''));
+    const dateParam=params.get('date')||'';
     const today=new Date();
     const monthNum=today.getMonth()+1;
-    const dateStr=today.getFullYear()+'년 '+monthNum+'월 '+today.getDate()+'일';
+    const dateStr=dateParam||(today.getFullYear()+'년 '+monthNum+'월 '+today.getDate()+'일');
     document.getElementById('metaInfo').textContent=dateStr+'  ·  '+monthNum+'월의 '+qNum+'번째 질문';
     document.getElementById('questionText').textContent='Q. '+(questions[q]||'질문을 불러올 수 없어요.');
 
