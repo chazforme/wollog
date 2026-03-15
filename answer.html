@@ -280,7 +280,16 @@
       try{
         const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'answer',email:uid,q:q,answer:answer,cycle:cycle})});
         const data=await res.json();
-        if(data.success){msg.innerHTML='기록됐어요.<br><span style="font-size:13px;opacity:.8;">다음 달 같은 질문과 함께 오늘의 답변을 다시 보내드려요.</span>';msg.className='message success';btn.textContent='기록 완료';answerEl.disabled=true;}
+        if(data.success){
+          document.querySelector('.card').innerHTML='<div style="text-align:center;padding:16px 0;">'
+            +'<div style="font-family:\'Noto Serif KR\',serif;font-size:26px;font-weight:400;color:#1A1814;line-height:1.6;margin-bottom:20px;">답변이 기록됐어요.</div>'
+            +'<div style="font-size:15px;color:#6B655D;line-height:1.9;">'
+            +'다음 달 같은 질문과 함께<br>오늘의 답변을 다시 보내드려요.'
+            +'</div></div>';
+          document.querySelector('.answer-card').style.display='none';
+          document.getElementById('submitBtn').style.display='none';
+          msg.className='message';msg.style.display='none';
+        }
         else{msg.textContent=data.message;msg.className='message error';btn.disabled=false;btn.textContent='답변 남기기';}
       }catch(err){msg.textContent='오류가 발생했어요. 다시 시도해주세요.';msg.className='message error';btn.disabled=false;btn.textContent='답변 남기기';}
     }

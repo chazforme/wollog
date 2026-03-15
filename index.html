@@ -228,10 +228,13 @@
         const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'signup',email,nickname,gender,age})});
         const data=await res.json();
         if(data.success){
-          document.getElementById('formSection').style.display='none';
           const nextDate=getNextMailDate();
-          msg.innerHTML='환영해요, '+nickname+'님!<br><br>첫 번째 질문은 <strong>'+nextDate+' 오전 8시</strong>에<br>메일로 도착할 거예요.';
-          msg.className='message success';
+          document.querySelector('.card').innerHTML='<div style="text-align:center;padding:16px 0;">'
+            +'<div style="font-family:\'Noto Serif KR\',serif;font-size:26px;font-weight:400;color:#1A1814;line-height:1.6;margin-bottom:20px;">가입 완료되었어요.</div>'
+            +'<div style="font-size:15px;color:#6B655D;line-height:1.9;">'
+            +'환영해요, '+nickname+'님!<br>'
+            +'첫 번째 질문은 <strong>'+nextDate+'<br>오전 8시</strong>에 메일로 도착할 거예요.'
+            +'</div></div>';
         }else if(data.message&&data.message.includes('이미 가입')){
           msg.innerHTML='이미 가입된 이메일이에요.<br><span style="font-size:13px;opacity:.8;">메일함에서 월록을 찾아보세요.</span>';
           msg.className='message info';
