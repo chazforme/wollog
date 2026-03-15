@@ -294,7 +294,8 @@
             +'다음 달 같은 질문과 함께<br>오늘의 답변을 다시 보내드려요.'
             +'</div>'
             +'</div>';
-          document.querySelector('.container').appendChild(done);
+          const footer=document.querySelector('.footer');
+          document.querySelector('.container').insertBefore(done,footer);
         }
         else{msg.textContent=data.message;msg.className='message error';btn.disabled=false;btn.textContent='답변 남기기';}
       }catch(err){msg.textContent='오류가 발생했어요. 다시 시도해주세요.';msg.className='message error';btn.disabled=false;btn.textContent='답변 남기기';}
