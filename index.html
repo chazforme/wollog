@@ -231,7 +231,8 @@
       if(!email||!nickname){msg.textContent='이메일과 닉네임을 모두 입력해주세요.';msg.className='message error';return;}
       btn.disabled=true;btn.textContent='잠시만요...';msg.className='message';msg.style.display='none';
       try{
-        const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'signup',email,nickname,gender,age})});
+        const from=new URLSearchParams(window.location.search).get('from')||'';
+        const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'signup',email,nickname,gender,age,from})});
         const data=await res.json();
         if(data.success){
           const nextDate=getNextMailDate();
