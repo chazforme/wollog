@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>월록 — 구독취소</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=IBM+Plex+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height:100%; background:#E8E3DC; }
+    body {
+      min-height:100%;
+      background:linear-gradient(165deg,#F7F4EF 0%,#EDE8E1 40%,#E8E3DC 100%);
+      color:#1A1814;
+      font-family:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+      font-weight:300;
+      display:flex; align-items:center; justify-content:center;
+      padding:48px 20px;
+      line-height:1.7;
+    }
+    .container { width:100%; max-width:460px; animation:fadeUp .6s ease-out; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    .logo { text-align:center; margin-bottom:48px; }
+    .logo-ko { font-family:'Noto Serif KR',serif; font-size:20px; font-weight:500; color:#6B655D; letter-spacing:6px; }
+    .logo-en { display:block; font-family:'IBM Plex Sans KR',sans-serif; font-size:10px; color:#B5B0AB; letter-spacing:4px; margin-top:4px; }
+    .card {
+      background:rgba(255,255,255,0.55);
+      border:1px solid rgba(255,255,255,0.7);
+      border-radius:20px;
+      padding:40px 28px;
+      text-align:center;
+    }
+    .card h2 {
+      font-family:'Noto Serif KR',serif;
+      font-size:20px;
+      font-weight:500;
+      color:#2E2B26;
+      margin-bottom:12px;
+    }
+    .card p {
+      font-size:14px;
+      color:#8C857D;
+      margin-bottom:24px;
+    }
+    .btn {
+      display:inline-block;
+      padding:14px 32px;
+      border:none;
+      border-radius:12px;
+      font-family:'IBM Plex Sans KR',sans-serif;
+      font-size:14px;
+      font-weight:400;
+      cursor:pointer;
+      transition:all .2s;
+    }
+    .btn-unsub {
+      background:#3D3831;
+      color:#fff;
+      margin-right:8px;
+    }
+    .btn-unsub:hover { background:#2E2B26; }
+    .btn-cancel {
+      background:rgba(255,255,255,0.6);
+      color:#6B655D;
+      border:1px solid rgba(0,0,0,0.08);
+    }
+    .btn-cancel:hover { background:rgba(255,255,255,0.8); }
+    .done-card {
+      display:none;
+      background:rgba(255,255,255,0.55);
+      border:1px solid rgba(255,255,255,0.7);
+      border-radius:20px;
+      padding:40px 28px;
+      text-align:center;
+    }
+    .done-card h2 {
+      font-family:'Noto Serif KR',serif;
+      font-size:20px;
+      font-weight:500;
+      color:#2E2B26;
+      margin-bottom:12px;
+    }
+    .done-card p {
+      font-size:14px;
+      color:#8C857D;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <span class="logo-ko">월 록</span>
+      <span class="logo-en">W O L L O G</span>
+    </div>
+
+    <div class="card" id="confirmCard">
+      <h2>구독을 취소할까요?</h2>
+      <p>취소하면 더 이상 질문 메일이 발송되지 않아요.<br>기존 답변 기록은 그대로 남아있어요.</p>
+      <button class="btn btn-unsub" onclick="doUnsub()">구독취소</button>
+      <button class="btn btn-cancel" onclick="window.close()">돌아가기</button>
+    </div>
+
+    <div class="done-card" id="doneCard">
+      <h2>구독이 취소되었어요.</h2>
+      <p>다시 돌아오고 싶을 때 언제든 가입해주세요.</p>
+    </div>
+  </div>
+
+  <script>
+    const API='https://script.google.com/macros/s/AKfycbwfMMCy-L8Q8oGbMOsjRRwiY4UyLj_yR2GxfCqaYuB_PVx4_2Cv7qHnvmQF88ORH5w/exec';
+    const params=new URLSearchParams(location.search);
+    const uid=params.get('uid')||'';
+
+    function doUnsub(){
+      if(!uid){alert('잘못된 접근이에요.');return;}
+      const btn=document.querySelector('.btn-unsub');
+      btn.textContent='처리 중...';
+      btn.disabled=true;
+      fetch(API,{method:'POST',body:JSON.stringify({action:'unsubscribe',email:uid}),headers:{'Content-Type':'text/plain'}})
+      .then(r=>r.json())
+      .then(d=>{
+        if(d.success){
+          document.getElementById('confirmCard').style.display='none';
+          document.getElementById('doneCard').style.display='block';
+        } else {
+          alert(d.message||'오류가 발생했어요.');
+          btn.textContent='구독취소';
+          btn.disabled=false;
+        }
+      })
+      .catch(()=>{alert('네트워크 오류가 발생했어요.');btn.textContent='구독취소';btn.disabled=false;});
+    }
+  </script>
+</body>
+</html>
