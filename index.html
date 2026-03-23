@@ -234,13 +234,27 @@
         const from=new URLSearchParams(window.location.search).get('from')||'';
         const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'signup',email,nickname,gender,age,from})});
         const data=await res.json();
-        if(data.success){
+        if(data.success&&data.rejoined){
+          // 재가입자 (inactive/purged → rejoined)
+          const nextDate=getNextMailDate();
+          document.querySelector('.card').innerHTML='<div style="text-align:center;padding:16px 0;">'
+            +'<div style="font-family:\'Noto Serif KR\',serif;font-size:26px;font-weight:400;color:#1A1814;line-height:1.6;margin-bottom:20px;">기다리고 있었어요!</div>'
+            +'<div style="font-size:15px;color:#6B655D;line-height:1.9;">'
+            +'다시 돌아오셨군요.<br>'
+            +'다음 질문은 <strong>'+nextDate+'<br>오전 8시</strong>에 메일로 도착할 거예요.'
+            +'</div></div>';
+        }else if(data.success){
           const nextDate=getNextMailDate();
           document.querySelector('.card').innerHTML='<div style="text-align:center;padding:16px 0;">'
             +'<div style="font-family:\'Noto Serif KR\',serif;font-size:26px;font-weight:400;color:#1A1814;line-height:1.6;margin-bottom:20px;">가입 완료되었어요.</div>'
             +'<div style="font-size:15px;color:#6B655D;line-height:1.9;">'
             +'환영해요, '+nickname+'님!<br>'
             +'첫 번째 질문은 <strong>'+nextDate+'<br>오전 8시</strong>에 메일로 도착할 거예요.'
+            +'</div>'
+            +'<div style="margin-top:24px;padding-top:20px;border-top:1px solid #EDEAE5;font-size:13px;color:#B5B0AB;line-height:1.9;">'
+            +'월록은 답이 쌓일수록 의미가 깊어지는 서비스입니다.<br>'
+            +'3회 연속 답변이 없으면 공지와 함께 구독 취소를 안내드리고 있습니다.<br>'
+            +'물론 언제든지 재구독도 가능합니다.'
             +'</div></div>';
         }else if(data.message&&data.message.includes('이미 가입')){
           msg.innerHTML='이미 가입된 이메일이에요.<br><span style="font-size:13px;opacity:.8;">메일함에서 월록을 찾아보세요.</span>';
